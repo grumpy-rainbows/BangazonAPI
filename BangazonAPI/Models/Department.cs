@@ -1,3 +1,4 @@
+
 ﻿/*
     Author : Jameka Echols
     Purpose: The purpose of this file is to create a custom type that will be used to model the data that we 
