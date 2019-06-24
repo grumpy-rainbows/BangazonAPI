@@ -17,7 +17,7 @@ namespace BangazonAPI.Models
         public string LastName { get; set; }
 
         [Required]
-        public int IsSuperVisor { get; set; }
+        public bool IsSuperVisor { get; set; }
 
         [Required]
         public int DepartmentId { get; set; }
