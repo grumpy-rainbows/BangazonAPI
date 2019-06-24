@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*
+    Done by: Jameka Echols
+*/
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
