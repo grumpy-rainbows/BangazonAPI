@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* Author: Billy Mathison
+ * Purpose: Creating a class of PaymentType to store information related to the payment, including name, account number, and id of the customer         making the payment. 
+ * Methods: None
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* Author: Billy Mathison
+ * Purpose: Creating a class of Order to store information related to the order, including id of the customer and id of the payment type. 
+ * Methods: None
+ */
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
