@@ -20,5 +20,7 @@ namespace BangazonAPI.Models
 
         [Required]
         public int PaymentTypeId { get; set; }
+
+        public List<Product> Products { get; set; } = new List<Product>();
     }
 }
