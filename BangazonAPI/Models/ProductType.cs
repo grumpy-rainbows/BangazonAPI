@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+// Author: Brian Jobe, Creates a ProductType Model with required properties.
+
 namespace BangazonAPI.Models
 {
     public class ProductType
