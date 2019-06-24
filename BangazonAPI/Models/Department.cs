@@ -2,7 +2,7 @@
     Author : Jameka Echols
     Purpose: The purpose of this file is to create a custom type that will be used to model the data that we 
              have in our database. This particular file is to minic the Training Program table which has the following 
-             properties such as: Id, Name, Budget and 
+             properties such as: Id, Name, Budget and a list of employees in that particular department
     Methods: NONE
                                     
 */
