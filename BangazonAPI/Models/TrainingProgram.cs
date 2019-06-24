@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace BangazonAPI.Models
 {
-    public class TrainingProgram<T>
+    public class TrainingProgram
     {
         public int Id { get; set; }
         [Required]
@@ -29,6 +29,6 @@ namespace BangazonAPI.Models
         [Required]
         public int MaxAttendees { get; set; }
 
-        List<T> EmployeesInTrainingProgram { get; set; } = new List<T>();
+        List<Employee> EmployeesInTrainingProgram { get; set; } = new List<Employee>();
     }
 }

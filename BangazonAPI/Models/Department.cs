@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BangazonAPI.Models
 {
-    public class Department<T>
+    public class Department
     {
         public int Id { get; set; }
 
@@ -24,6 +24,6 @@ namespace BangazonAPI.Models
 
         [Required]
         public int Budget { get; set; }
-        public List<T> DepartmentEmployees { get; set; } = new List<T>();
+        public List<Employee> DepartmentEmployees { get; set; } = new List<Employee>();
     }
 }
