@@ -5,7 +5,12 @@ using System.Threading.Tasks;
 
 namespace BangazonAPI.Models
 {
-    public class Class
+    public class ProductType
     {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public List<Product> Products { get; set; } = new List<Product>();
     }
 }
