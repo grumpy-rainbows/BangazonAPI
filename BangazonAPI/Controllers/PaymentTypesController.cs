@@ -74,10 +74,48 @@ namespace BangazonAPI.Controllers
         }
 
         // GET: api/PaymentType/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        [HttpGet("{id}", Name = "GetPaymentType")]
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
-            return "value";
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT p.Id AS PayId,
+                                        p.AcctNumber,
+                                        p.Name,
+                                        p.CustomerId AS CusId
+                                        c.FirstName,
+                                        c.LastName 
+                                        FROM PaymentType p
+                                        LEFT JOIN Customer c ON c.Id = p.CustomerId
+                                        WHERE p.Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    PaymentType paymentType = null;
+                    if (reader.Read())
+                    {
+                        paymentType = new PaymentType
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("PayId")),
+                            AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CusId")),
+                            Customer = new Customer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CusId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            }
+                        };
+                    }
+                    reader.Close();
+
+                    return Ok(paymentType);
+                }
+            }
         }
 
         // POST: api/PaymentType
