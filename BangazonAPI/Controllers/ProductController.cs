@@ -207,15 +207,78 @@ namespace BangazonAPI.Controllers
         }
 
         // PUT: api/Product/5
+
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Product product)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    // open the connection
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Product
+                                            SET ProductTypeId = @productTypeId,
+                                                CustomerId = @customerId,
+                                                Price = @price,
+                                                Title = @title,
+                                                Description = @description,
+                                                Quantity = @quantity
+                                            WHERE Id = @id";
+
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@productTypeId", product.ProductTypeId));
+                        cmd.Parameters.Add(new SqlParameter("@customerId", product.CustomerId));
+                        cmd.Parameters.Add(new SqlParameter("@price", product.Price));
+                        cmd.Parameters.Add(new SqlParameter("@title", product.Title));
+                        cmd.Parameters.Add(new SqlParameter("@description", product.Description));
+                        cmd.Parameters.Add(new SqlParameter("@quantity", product.Quantity));
+
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ProductExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+
+        private bool ProductExists(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id FROM Product WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+            }
         }
     }
 }
