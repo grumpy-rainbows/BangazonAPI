@@ -1,6 +1,10 @@
-﻿using BangazonAPI.Models;
+﻿/* Author: Billy Mathison
+ * Purpose: Creating tests for the PaymentType controller methods of GET, POST, PUT, and DELETE. 
+ * Methods: Test_Get_All_PaymentTypes, Test_Single_PaymentType, Test_Get_NonExistant_PaymentType_Fails, Test_Create_and_Delete_PaymentType, Test_Delete_NonExistent_PaymentType_Fails, Test_Modify_PaymentType.
+ */
+
+using BangazonAPI.Models;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -97,6 +101,53 @@ namespace TestBangazonAPI
 
                 Assert.False(deleteResponse.IsSuccessStatusCode);
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Modify_PaymentType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /*Initial GET
+                 */
+                var payment = await client.GetAsync("/api/PaymentType/4");
+
+                string paymentBody = await payment.Content.ReadAsStringAsync();
+                var paymentType = JsonConvert.DeserializeObject<PaymentType>(paymentBody);
+
+                Assert.Equal(HttpStatusCode.OK, payment.StatusCode);
+
+                /*
+                    PUT section
+                 */
+                PaymentType modifiedPaymentType = new PaymentType
+                {
+                    AcctNumber = paymentType.AcctNumber + 1,
+                    Name = "PayPal",
+                    CustomerId = 1
+                };
+                var modifiedPaymentTypeAsJSON = JsonConvert.SerializeObject(modifiedPaymentType);
+
+                var response = await client.PutAsync(
+                    "/api/paymentType/4",
+                    new StringContent(modifiedPaymentTypeAsJSON, Encoding.UTF8, "application/json")
+                );
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+                /*
+                    GET section
+                 */
+                var getPayment = await client.GetAsync("/api/PaymentType/4");
+                getPayment.EnsureSuccessStatusCode();
+
+                string getPaymentBody = await getPayment.Content.ReadAsStringAsync();
+                PaymentType newPayment = JsonConvert.DeserializeObject<PaymentType>(getPaymentBody);
+
+                Assert.Equal(HttpStatusCode.OK, getPayment.StatusCode);
+                Assert.Equal(paymentType.AcctNumber + 1, newPayment.AcctNumber);
             }
         }
     }

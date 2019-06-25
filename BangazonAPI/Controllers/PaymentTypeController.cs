@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* Author: Billy Mathison
+ * Purpose: Creating a controller for the PaymentType class. 
+ * Methods: GET ALL, GET SINGLE, POST, PUT, and DELETE
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
