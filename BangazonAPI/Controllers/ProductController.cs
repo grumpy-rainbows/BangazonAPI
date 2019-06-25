@@ -137,7 +137,7 @@ namespace BangazonAPI.Controllers
                                         FROM Product p
                                         JOIN Customer c ON c.Id = p.CustomerId
                                         JOIN ProductType pt ON pt.Id = p.ProductTypeId
-                                        WHERE Id = @id;";
+                                        WHERE p.Id = @id;";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
