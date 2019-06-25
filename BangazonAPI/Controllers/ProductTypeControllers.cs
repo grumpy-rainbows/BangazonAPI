@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using BangazonAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -75,7 +76,7 @@ namespace BangazonAPI.Controllers
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
-                using(SqlCommand cmd = conn.CreateCommand())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT
                                                     pt.Id,
@@ -93,7 +94,7 @@ namespace BangazonAPI.Controllers
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name"))
                         };
-                  
+
                     }
                     reader.Close();
                     return Ok(productType);
@@ -110,17 +111,70 @@ namespace BangazonAPI.Controllers
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
-                    {
+                {
                     cmd.CommandText = @"INSERT INTO ProductType ([Name]) OUTPUT INSERTED.Id VALUES (@Name)";
                     cmd.Parameters.Add(new SqlParameter("@Name", productType.Name));
-                    int newId = (int) await cmd.ExecuteScalarAsync();
+                    int newId = (int)await cmd.ExecuteScalarAsync();
                     productType.Id = newId;
                     return CreatedAtRoute("GetProductTypeById", new { id = newId }, productType);
                 }
             }
         }
 
+        //Put  Product Type
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] ProductType productType)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE ProductType
+                                            SET Name = @Name
+                                            WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@Name", productType.Name));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!ProductTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
+        private bool ProductTypeExists(int id)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id FROM ProductType WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+
+            }
+        }
     }
 }
