@@ -93,18 +93,52 @@ namespace BangazonAPI.Controllers
         }
 
 
-
-
-
-
-
-
-
         // GET: api/Product/5
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return "checking";
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = $@"SELECT Id,
+                                                ProductTypeId,
+                                                CustomerId,
+                                                Price,
+                                                Title,
+                                                Description,
+                                                Quantity
+                                        FROM Product
+                                        WHERE Id = @id;";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    Product product = null;
+                    while (reader.Read())
+                    {
+                        if(product == null)
+                        {
+                            product = new Product
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                            };
+                        }
+                    }
+                    // step 5 close the connection and return the single product
+                    reader.Close();
+
+                    return Ok(product);
+                }
+            }
         }
 
         // POST: api/Product
