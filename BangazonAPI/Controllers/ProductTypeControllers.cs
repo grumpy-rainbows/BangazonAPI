@@ -102,6 +102,24 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //Post a product type
+        [HttpPost]
+        public async Task<IActionResult> PostProductType([FromBody] ProductType productType)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                    cmd.CommandText = @"INSERT INTO ProductType ([Name]) OUTPUT INSERTED.Id VALUES (@Name)";
+                    cmd.Parameters.Add(new SqlParameter("@Name", productType.Name));
+                    int newId = (int) await cmd.ExecuteScalarAsync();
+                    productType.Id = newId;
+                    return CreatedAtRoute("GetProductTypeById", new { id = newId }, productType);
+                }
+            }
+        }
+
 
 
     }
