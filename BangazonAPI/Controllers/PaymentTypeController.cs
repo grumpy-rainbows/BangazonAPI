@@ -155,7 +155,7 @@ namespace BangazonAPI.Controllers
                         cmd.CommandText = @"UPDATE PaymentType
                                             SET AcctNumber = @acctNumber,
                                                 Name = @name,
-                                                CustomerId = @customerId,
+                                                CustomerId = @customerId
                                             WHERE Id = @id";
                         cmd.Parameters.Add(new SqlParameter("@acctNumber", paymentType.AcctNumber));
                         cmd.Parameters.Add(new SqlParameter("@name", paymentType.Name));
@@ -186,9 +186,40 @@ namespace BangazonAPI.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM PaymentType WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!PaymentTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
+
         private bool PaymentTypeExists(int id)
         {
             using (SqlConnection conn = Connection)
@@ -196,10 +227,10 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT p.Id AS PayId,
+                    cmd.CommandText = @"SELECT p.Id,
                                         p.AcctNumber,
                                         p.Name,
-                                        p.CustomerId AS CusId,
+                                        p.CustomerId,
                                         c.FirstName,
                                         c.LastName 
                                         FROM PaymentType p
