@@ -52,27 +52,27 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-            ProductType productType = new ProductType
+            ProductType Phone = new ProductType
             {
                 Name = "Phone"
             };
-                var productTypeJson = JsonConvert.SerializeObject(productType);
+                var phoneAsJson = JsonConvert.SerializeObject(Phone);
 
                 var response = await client.PostAsync(
                     "/api/productType",
-                    new StringContent(productTypeJson, Encoding.UTF8, "application/json")
+                    new StringContent(phoneAsJson, Encoding.UTF8, "application/json")
                     );
 
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                var newProductType = JsonConvert.DeserializeObject<ProductType>(responseBody);
+                var newPhone = JsonConvert.DeserializeObject<ProductType>(responseBody);
 
 
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                Assert.Equal(productType.Name, newProductType.Name);
+                Assert.Equal(Phone.Name, newPhone.Name);
 
-                var deleteRespone = await client.DeleteAsync($"/productType/{newProductType.Name}");
-                Assert.Equal(HttpStatusCode.NoContent, deleteRespone.StatusCode);
+                var deleteResponse = await client.DeleteAsync($"api/productType/{newPhone.Id}");
+                Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
             }
         }
@@ -119,9 +119,10 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.DeleteAsync("/api/productType/600000");
+                var deleteResponse = await client.DeleteAsync("/api/productType/600000");
 
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                Assert.False(deleteResponse.IsSuccessStatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
         }
 
