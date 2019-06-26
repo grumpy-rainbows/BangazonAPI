@@ -93,7 +93,7 @@ namespace TestBangazonAPI
 
 
                 var response = await client.PostAsync(
-                    "/product",
+                    "/api/product",
                     new StringContent(product1AsJSON, Encoding.UTF8, "application/json")
                 );
 
