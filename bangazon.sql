@@ -1,112 +1,19 @@
-USE MASTER
-GO
 
-IF NOT EXISTS (
-    SELECT [name]
-    FROM sys.databases
-    WHERE [name] = N'BangazonAPI'
-)
-CREATE DATABASE BangazonAPI
-GO
+INSERT INTO Customer (FirstName, LastName) VALUES('Jameka', 'Echols');
+INSERT INTO Customer (FirstName, LastName) VALUES('Ali', 'Abdulle');
+INSERT INTO Customer (FirstName, LastName) VALUES('Brian', 'Jobe');
+INSERT INTO Customer (FirstName, LastName) VALUES('Billy', 'Mathison');
 
-USE BangazonAPI
-GO
+SELECT * from Customer;
 
+INSERT INTO ProductType (Name) VALUES('Appliances');
+INSERT INTO ProductType (Name) VALUES('Electronics');
+INSERT INTO ProductType (Name) VALUES('Books');
+SELECT * FROM productType;
 
-CREATE TABLE Department (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	[Name] VARCHAR(55) NOT NULL,
-	Budget 	INTEGER NOT NULL
-);
+INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (1, 2, 550.00, 'Oven', 'General Electronics create an all around oven for the best bakers around.', 2);
+INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (2, 1, 3600.99, '2019 MacBook Pro', 'Apple presents this new MacBook pro with new a new i8 processor', 5);
+INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 4, 14.00, 'Lovecraft Country', 'In the Jim Crow era, a group of individuals live through the terrors of America.', 19);
+INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 3, 11.50, 'Harry Potter and the Half-blood Prince', 'Another installation of the Wizarding World from author, J.K. Rowling, deliverying yet another magical piece of literature.', 21);
 
-CREATE TABLE Employee (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	FirstName VARCHAR(55) NOT NULL,
-	LastName VARCHAR(55) NOT NULL,
-	DepartmentId INTEGER NOT NULL,
-	IsSuperVisor BIT NOT NULL DEFAULT(0),
-    CONSTRAINT FK_EmployeeDepartment FOREIGN KEY(DepartmentId) REFERENCES Department(Id)
-);
-
-CREATE TABLE Computer (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	PurchaseDate DATETIME NOT NULL,
-	DecomissionDate DATETIME,
-	Make VARCHAR(55) NOT NULL,
-	Manufacturer VARCHAR(55) NOT NULL
-);
-
-CREATE TABLE ComputerEmployee (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	EmployeeId INTEGER NOT NULL,
-	ComputerId INTEGER NOT NULL,
-	AssignDate DATETIME NOT NULL,
-	UnassignDate DATETIME,
-    CONSTRAINT FK_ComputerEmployee_Employee FOREIGN KEY(EmployeeId) REFERENCES Employee(Id),
-    CONSTRAINT FK_ComputerEmployee_Computer FOREIGN KEY(ComputerId) REFERENCES Computer(Id)
-);
-
-
-CREATE TABLE TrainingProgram (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	[Name] VARCHAR(255) NOT NULL,
-	StartDate DATETIME NOT NULL,
-	EndDate DATETIME NOT NULL,
-	MaxAttendees INTEGER NOT NULL
-);
-
-CREATE TABLE EmployeeTraining (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	EmployeeId INTEGER NOT NULL,
-	TrainingProgramId INTEGER NOT NULL,
-    CONSTRAINT FK_EmployeeTraining_Employee FOREIGN KEY(EmployeeId) REFERENCES Employee(Id),
-    CONSTRAINT FK_EmployeeTraining_Training FOREIGN KEY(TrainingProgramId) REFERENCES TrainingProgram(Id)
-);
-
-CREATE TABLE ProductType (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	[Name] VARCHAR(55) NOT NULL
-);
-
-CREATE TABLE Customer (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	FirstName VARCHAR(55) NOT NULL,
-	LastName VARCHAR(55) NOT NULL
-);
-
-CREATE TABLE Product (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	ProductTypeId INTEGER NOT NULL,
-	CustomerId INTEGER NOT NULL,
-	Price MONEY NOT NULL,
-	Title VARCHAR(255) NOT NULL,
-	[Description] VARCHAR(255) NOT NULL,
-	Quantity INTEGER NOT NULL,
-    CONSTRAINT FK_Product_ProductType FOREIGN KEY(ProductTypeId) REFERENCES ProductType(Id),
-    CONSTRAINT FK_Product_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id)
-);
-
-
-CREATE TABLE PaymentType (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	AcctNumber INTEGER NOT NULL,
-	[Name] VARCHAR(55) NOT NULL,
-	CustomerId INTEGER NOT NULL,
-    CONSTRAINT FK_PaymentType_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id)
-);
-
-CREATE TABLE [Order] (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	CustomerId INTEGER NOT NULL,
-	PaymentTypeId INTEGER,
-    CONSTRAINT FK_Order_Customer FOREIGN KEY(CustomerId) REFERENCES Customer(Id),
-    CONSTRAINT FK_Order_Payment FOREIGN KEY(PaymentTypeId) REFERENCES PaymentType(Id)
-);
-
-CREATE TABLE OrderProduct (
-	Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
-	OrderId INTEGER NOT NULL,
-	ProductId INTEGER NOT NULL,
-    CONSTRAINT FK_OrderProduct_Product FOREIGN KEY(ProductId) REFERENCES Product(Id),
-    CONSTRAINT FK_OrderProduct_Order FOREIGN KEY(OrderId) REFERENCES [Order](Id)
-);
+SELECT * FROM Product;

@@ -52,7 +52,7 @@ namespace TestBangazonAPI
 
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/product/4");
+                var response = await client.GetAsync("/api/product/3");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
