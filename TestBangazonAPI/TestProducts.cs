@@ -115,10 +115,17 @@ namespace TestBangazonAPI
         public async Task Test_Modify_Product()
         {
             // New title to change to and test
-            string newTitle = "Maytag Stove";
+            //string newTitle = "Maytag Stove";
 
             using (var client = new APIClientProvider().Client)
             {
+
+                var response1 = await client.GetAsync("/api/product/1");
+
+
+                string responseBody1 = await response1.Content.ReadAsStringAsync();
+                var getProduct1 = JsonConvert.DeserializeObject<Product>(responseBody1);
+
                 /*
                     PUT section
                  */
@@ -127,9 +134,9 @@ namespace TestBangazonAPI
                     ProductTypeId = 1,
                     CustomerId = 2,
                     Price = 550,
-                    Title = newTitle,
+                    Title = "Maytag Stove",
                     Description = "General Electronics create an all around oven for the best bakers around.",
-                    Quantity = 2
+                    Quantity = getProduct1.Quantity + 1
                 };
                 var modifiedProductAsJSON = JsonConvert.SerializeObject(modifiedProduct);
 
@@ -151,7 +158,7 @@ namespace TestBangazonAPI
                 Product newProduct = JsonConvert.DeserializeObject<Product>(getProductBody);
 
                 Assert.Equal(HttpStatusCode.OK, getProduct.StatusCode);
-                Assert.Equal(newTitle, newProduct.Title);
+                Assert.Equal(modifiedProduct.Quantity + 1, newProduct.Quantity + 1);
             }
         }
     }
