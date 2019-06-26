@@ -32,11 +32,13 @@ namespace BangazonAPI.Controllers
 
         // GET api/values
         [HttpGet]
-        public async Task<IActionResult> Get(string q)
+        public async Task<IActionResult> Get(string q, string _includes)
         {
             string sql = @"SELECT c.Id, c.FirstName, 
-                                    c.LastName
+                                    c.LastName, pt.Id AS PaymentTypeId, 
+                                    pt.AcctNumber, pt.CustomerId, pt.Name
                                     FROM Customer c
+                                    JOIN PaymentType pt ON pt.CustomerId = c.Id
                                     WHERE 2=2";
 
             if (q != null)
@@ -48,6 +50,8 @@ namespace BangazonAPI.Controllers
                     ";
 
             }
+
+
 
             using (SqlConnection conn = Connection)
             {
@@ -64,17 +68,43 @@ namespace BangazonAPI.Controllers
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     List<Customer> customers = new List<Customer>();
+                    List<Product> products = new List<Product>();
+                    List<PaymentType> paymentTypes = new List<PaymentType>();
                     while (reader.Read())
                     {
-                        Customer customer = new Customer
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            // You might have more columns
-                        };
 
-                        customers.Add(customer);
+                        Customer customer;
+                        if (!customers.Exists(a => a.Id == reader.GetInt32(reader.GetOrdinal("Id"))))
+                        {
+                            customer = new Customer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                PaymentTypes = paymentTypes,
+                                Products = products,
+                                Orders = new List<Order>()
+                            };
+                            customers.Add(customer);
+                        }
+                        customer = customers.Find(a => a.Id == reader.GetInt32(reader.GetOrdinal("Id")));
+
+                        if (_includes != null)
+                        {
+                            PaymentType paymentType = new PaymentType
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber"))
+                            };
+
+                            if (customer.Id == paymentType.CustomerId)
+                            {
+                                customer.PaymentTypes.Add(paymentType);
+                            }
+                        }
+
                     }
 
                     reader.Close();
