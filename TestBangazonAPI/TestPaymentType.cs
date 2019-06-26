@@ -44,8 +44,8 @@ namespace TestBangazonAPI
                 var paymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(12345, paymentType.AcctNumber);
-                Assert.Equal("Visa", paymentType.Name);
+                Assert.Equal(22222, paymentType.AcctNumber);
+                Assert.Equal("Test", paymentType.Name);
                 Assert.NotNull(paymentType);
             }
         }

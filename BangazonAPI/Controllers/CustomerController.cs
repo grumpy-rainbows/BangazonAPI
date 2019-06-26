@@ -35,10 +35,21 @@ namespace BangazonAPI.Controllers
         public async Task<IActionResult> Get(string q, string _includes)
         {
             string sql = @"SELECT c.Id, c.FirstName, 
-                                    c.LastName, pt.Id AS PaymentTypeId, 
-                                    pt.AcctNumber, pt.CustomerId, pt.Name
+                                    c.LastName, 
+                                    pt.Id AS PaymentTypeId, 
+                                    pt.AcctNumber, 
+                                    pt.CustomerId, 
+                                    pt.Name,
+                                    p.Id AS ProductId,
+                                    p.ProductTypeId,
+                                    p.CustomerId,
+                                    p.Price,
+                                    p.Title,
+                                    p.Description,
+                                    p.Quantity
                                     FROM Customer c
                                     JOIN PaymentType pt ON pt.CustomerId = c.Id
+                                    JOIN Product p ON p.CustomerId = c.Id
                                     WHERE 2=2";
 
             if (q != null)
@@ -50,8 +61,6 @@ namespace BangazonAPI.Controllers
                     ";
 
             }
-
-
 
             using (SqlConnection conn = Connection)
             {
@@ -68,12 +77,14 @@ namespace BangazonAPI.Controllers
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     List<Customer> customers = new List<Customer>();
-                    List<Product> products = new List<Product>();
-                    List<PaymentType> paymentTypes = new List<PaymentType>();
+
                     while (reader.Read())
                     {
 
                         Customer customer;
+                        List<Product> products = new List<Product>();
+                        List<PaymentType> paymentTypes = new List<PaymentType>();
+
                         if (!customers.Exists(a => a.Id == reader.GetInt32(reader.GetOrdinal("Id"))))
                         {
                             customer = new Customer
@@ -89,21 +100,39 @@ namespace BangazonAPI.Controllers
                         }
                         customer = customers.Find(a => a.Id == reader.GetInt32(reader.GetOrdinal("Id")));
 
-                        if (_includes != null)
+                        if (_includes == "payments")
                         {
                             PaymentType paymentType = new PaymentType
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                                CustomerId = reader.GetInt32(reader.GetOrdinal("Id")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                                 Name = reader.GetString(reader.GetOrdinal("Name")),
                                 AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber"))
                             };
 
-                            if (customer.Id == paymentType.CustomerId)
+                            if (customer.Id == paymentType.CustomerId && !customer.PaymentTypes.Exists(a => a.Id == reader.GetInt32(reader.GetOrdinal("PaymentTypeId"))))
                             {
                                 customer.PaymentTypes.Add(paymentType);
                             }
                         }
+                        if (_includes == "products")
+                        {
+                            Product product = new Product
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("Price")),
+                                Title = reader.GetString(reader.GetOrdinal("Title")),
+                                Description = reader.GetString(reader.GetOrdinal("Description")),
+                                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                            };
+                            if (customer.Id == product.CustomerId && !customer.Products.Exists(a => a.Id == reader.GetInt32(reader.GetOrdinal("ProductId"))))
+                            {
+                                customer.Products.Add(product);
+                            }
+                        }
+
 
                     }
 
@@ -115,7 +144,7 @@ namespace BangazonAPI.Controllers
         }
 
         // GET api/values/5
-        [HttpGet("{id}", Name="GetCustomer")]
+        [HttpGet("{id}", Name = "GetCustomer")]
         public async Task<IActionResult> Get(int id)
         {
             if (!CustomerExists(id))
@@ -225,7 +254,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-         //DELETE api/values/5
+        //DELETE api/values/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

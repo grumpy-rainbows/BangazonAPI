@@ -47,8 +47,8 @@ namespace TestBangazonAPI
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("Dave", customer.FirstName);
-                Assert.Equal("Anderson", customer.LastName);
+                Assert.Equal("Jameka", customer.FirstName);
+                Assert.Equal("Echols", customer.LastName);
                 Assert.NotNull(customer);
 
             }
@@ -88,25 +88,25 @@ namespace TestBangazonAPI
         public async Task Test_Modify_Customer()
         {
             // New last name to change to and test
-            string newLastName = "Andy";
-            string oldLastName = "Anderson";
+            string newLastName = "Edwards";
+            string oldLastName = "Echols";
 
             using (var client = new APIClientProvider().Client)
             {
                 /*
                     PUT section
                  */
-                Customer modifiedDave = new Customer
+                Customer modifiedCustomer = new Customer
                 {
-                    FirstName = "Dave",
+                    FirstName = "Jameka",
                     LastName = newLastName,
 
                 };
-                var modifiedDaveAsJSON = JsonConvert.SerializeObject(modifiedDave);
+                var modifiedCustomerAsJSON = JsonConvert.SerializeObject(modifiedCustomer);
 
                 var response = await client.PutAsync(
                     "/api/customer/1",
-                    new StringContent(modifiedDaveAsJSON, Encoding.UTF8, "application/json")
+                    new StringContent(modifiedCustomerAsJSON, Encoding.UTF8, "application/json")
                 );
                 string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -115,27 +115,27 @@ namespace TestBangazonAPI
                 /*
                     GET section
                  */
-                var getDave = await client.GetAsync("/api/customer/1");
-                getDave.EnsureSuccessStatusCode();
+                var getCustomer = await client.GetAsync("/api/customer/1");
+                getCustomer.EnsureSuccessStatusCode();
 
-                string getDaveBody = await getDave.Content.ReadAsStringAsync();
-                Customer newDave = JsonConvert.DeserializeObject<Customer>(getDaveBody);
+                string getCustomerBody = await getCustomer.Content.ReadAsStringAsync();
+                Customer newCustomer = JsonConvert.DeserializeObject<Customer>(getCustomerBody);
 
-                Assert.Equal(HttpStatusCode.OK, getDave.StatusCode);
-                Assert.Equal(newLastName, newDave.LastName);
+                Assert.Equal(HttpStatusCode.OK, getCustomer.StatusCode);
+                Assert.Equal(newLastName, newCustomer.LastName);
 
 
-                Customer originalDave = new Customer
+                Customer originalCustomer = new Customer
                 {
-                    FirstName = "Dave",
+                    FirstName = "Jameka",
                     LastName = oldLastName,
 
                 };
-                var originalDaveAsJSON = JsonConvert.SerializeObject(originalDave);
+                var originalCustomerAsJSON = JsonConvert.SerializeObject(originalCustomer);
 
                 var originalResponse = await client.PutAsync(
                                 "/api/customer/1",
-                                new StringContent(originalDaveAsJSON, Encoding.UTF8, "application/json")
+                                new StringContent(originalCustomerAsJSON, Encoding.UTF8, "application/json")
                             );
                 string responseBodyOriginal = await response.Content.ReadAsStringAsync();
 
