@@ -47,8 +47,8 @@ namespace TestBangazonAPI
                     ASSERT
                 */
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal("Ali", customer.FirstName);
-                Assert.Equal("Abdulle", customer.LastName);
+                Assert.Equal("Dave", customer.FirstName);
+                Assert.Equal("Anderson", customer.LastName);
                 Assert.NotNull(customer);
 
             }
@@ -88,7 +88,8 @@ namespace TestBangazonAPI
         public async Task Test_Modify_Customer()
         {
             // New last name to change to and test
-            string newLastName = "Anderson";
+            string newLastName = "Andy";
+            string oldLastName = "Anderson";
 
             using (var client = new APIClientProvider().Client)
             {
@@ -122,6 +123,25 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, getDave.StatusCode);
                 Assert.Equal(newLastName, newDave.LastName);
+
+
+                Customer originalDave = new Customer
+                {
+                    FirstName = "Dave",
+                    LastName = oldLastName,
+
+                };
+                var originalDaveAsJSON = JsonConvert.SerializeObject(originalDave);
+
+                var originalResponse = await client.PutAsync(
+                                "/api/customer/1",
+                                new StringContent(originalDaveAsJSON, Encoding.UTF8, "application/json")
+                            );
+                string responseBodyOriginal = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, originalResponse.StatusCode);
+
+
             }
         }
 
