@@ -116,7 +116,7 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.DeleteAsync("/api/productType/14");
+                var response = await client.DeleteAsync("/api/productType/17");
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }
