@@ -2,7 +2,10 @@
     Author: Jameka Echols
     Purpose: The purpose of this controller is to make all the calls to the database to GET, POST, PUT and DELETE
              data specific to the Product table in the BangazonAPI database. 
-    Method: 
+    Method: I created the GET method which will return a list of products, a GET that will return a
+            single product based on the id that was passed in, a POST method which will create a 
+            product and also make a GET call and I also created a DELETE method that will 
+            delete a product based off the id that passed to it.
 */
 
 

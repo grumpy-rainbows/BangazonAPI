@@ -1,7 +1,8 @@
 ﻿/*
     Author: Jameka Echols 
-    Purpose: 
-    Methods: 
+    Purpose: The purpose of this file is to create test methods for the product controller
+    Methods: I created a test methods for getting all products, getting one product, get a product
+                that is nonexistant, create and delete product and modifying a product. 
 */
 
 using System;
