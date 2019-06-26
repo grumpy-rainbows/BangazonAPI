@@ -110,5 +110,17 @@ namespace TestBangazonAPI
             }
         }
 
+        //Detete Product Type
+        [Fact]
+        public async Task Test_Delete_ProductType()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.DeleteAsync("/api/productType/12");
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            }
+        }
+
     }
 }
