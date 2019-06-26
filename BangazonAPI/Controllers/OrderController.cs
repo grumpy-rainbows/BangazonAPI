@@ -1,4 +1,9 @@
-﻿using System;
+﻿/* Author: Billy Mathison
+ * Purpose: Creating a controller for the Order class. 
+ * Methods: GET ALL, GET SINGLE, POST, PUT, and DELETE
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -38,7 +43,7 @@ namespace BangazonAPI.Controllers
                                         c.FirstName,
                                         c.LastName,
                                         pt.AcctNumber,
-                                        pt.Name,
+                                        pt.Name AS PaymentTypeName,
                                         pt.CustomerId AS PayCusId,
                                         p.Id AS ProductId,
                                         p.Price,
@@ -47,7 +52,7 @@ namespace BangazonAPI.Controllers
                                         p.Quantity,
                                         p.ProductTypeId,
                                         prodt.Id AS ProductTypeId,
-                                        prodt.Name
+                                        prodt.Name AS ProductTypeName
                                         FROM Order o
                                         LEFT JOIN Customer c ON c.Id = o.CustomerId
                                         LEFT JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
@@ -65,7 +70,6 @@ namespace BangazonAPI.Controllers
 
                     Dictionary<int, Order> orderHash = new Dictionary<int, Order>();
 
-                    List<Order> orders = new List<Order>();
                     while (reader.Read())
                     {
                         int orderId = reader.GetInt32(reader.GetOrdinal("OrderId"));
@@ -86,7 +90,7 @@ namespace BangazonAPI.Controllers
                                 {
                                     Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                                     AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
-                                    Name = reader.GetString(reader.GetOrdinal("Name")),
+                                    Name = reader.GetString(reader.GetOrdinal("PaymentTypeName")),
                                     CustomerId = reader.GetInt32(reader.GetOrdinal("PayCusId"))
                                 }
                             };
@@ -94,23 +98,21 @@ namespace BangazonAPI.Controllers
 
                         orderHash[orderId].Products.Add(new Product
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
                             Price = reader.GetDecimal(reader.GetOrdinal("Price")),
-                            Title
-
-                            Description
-                            Quantity
-                            CustomerId
-                            ProductTypeId
+                            Title = reader.GetString(reader.GetOrdinal("Title")),
+                            Description = reader.GetString(reader.GetOrdinal("Description")),
+                            Quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                             ProductType = new ProductType
                             {
-                                Id
-                                Name
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                Name = reader.GetString(reader.GetOrdinal("ProductTypeName"))
                             }
                         });
-
-                        orders.Add(order);
                     }
+                    List<Order> orders = orderHash.Values.ToList();
                     reader.Close();
 
                     return Ok(orders);
