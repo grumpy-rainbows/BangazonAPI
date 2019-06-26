@@ -48,7 +48,7 @@ namespace TestBangazonAPI
 
         //Post a new Product Type
         [Fact]
-        public async Task Test_Post_ProductType()
+        public async Task Test_Post_And_Delete_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -71,6 +71,9 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Equal(productType.Name, newProductType.Name);
 
+                var deleteRespone = await client.DeleteAsync($"/productType/{newProductType.Name}");
+                Assert.Equal(HttpStatusCode.NoContent, deleteRespone.StatusCode);
+
             }
         }
 
@@ -89,7 +92,7 @@ namespace TestBangazonAPI
                 var productTypeJson = JsonConvert.SerializeObject(changeProductType);
 
                 var response = await client.PutAsync(
-                    "/api/productType/7",
+                    "/api/productType/1",
                     new StringContent(productTypeJson, Encoding.UTF8, "application/json")
                     );
 
@@ -97,7 +100,7 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-                var getProducType = await client.GetAsync("/api/productType/7");
+                var getProducType = await client.GetAsync("/api/productType/1");
                 getProducType.EnsureSuccessStatusCode();
 
                 string getProductTypeBody = await getProducType.Content.ReadAsStringAsync();
@@ -112,11 +115,11 @@ namespace TestBangazonAPI
 
         //Detete Product Type
         [Fact]
-        public async Task Test_Delete_ProductType()
+        public async Task Test_Delete_NonExistent_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.DeleteAsync("/api/productType/16");
+                var response = await client.DeleteAsync("/api/productType/600000");
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }
