@@ -110,6 +110,48 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
         }
+        [Fact]
+        public async Task Test_Modify_Product()
+        {
+            // New title to change to and test
+            string newTitle = "Maytag Stove";
 
+            using (var client = new APIClientProvider().Client)
+            {
+                /*
+                    PUT section
+                 */
+                Product modifiedProduct = new Product
+                {
+                    ProductTypeId = 1,
+                    CustomerId = 2,
+                    Price = 550,
+                    Title = newTitle,
+                    Description = "General Electronics create an all around oven for the best bakers around.",
+                    Quantity = 2
+                };
+                var modifiedProductAsJSON = JsonConvert.SerializeObject(modifiedProduct);
+
+                var response = await client.PutAsync(
+                    "/api/product/1",
+                    new StringContent(modifiedProductAsJSON, Encoding.UTF8, "application/json")
+                );
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+                /*
+                    GET section
+                 */
+                var getProduct = await client.GetAsync("/api/product/1");
+                getProduct.EnsureSuccessStatusCode();
+
+                string getProductBody = await getProduct.Content.ReadAsStringAsync();
+                Product newProduct = JsonConvert.DeserializeObject<Product>(getProductBody);
+
+                Assert.Equal(HttpStatusCode.OK, getProduct.StatusCode);
+                Assert.Equal(newTitle, newProduct.Title);
+            }
+        }
     }
 }
