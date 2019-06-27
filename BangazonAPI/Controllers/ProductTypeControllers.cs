@@ -1,6 +1,7 @@
 ﻿/*
     Author : Ali Abdulle
-    purpose: Creating ProductType Controller to navigate the product file
+    purpose: Creating ProductType Controller
+    Method: Get, Post, Put, and Delete
  */
 using System;
 using System.Collections.Generic;
