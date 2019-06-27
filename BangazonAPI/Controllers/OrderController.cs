@@ -53,7 +53,7 @@ namespace BangazonAPI.Controllers
                                         p.ProductTypeId,
                                         prodt.Id AS ProductTypeId,
                                         prodt.Name AS ProductTypeName
-                                        FROM Order o
+                                        FROM [Order] o
                                         LEFT JOIN Customer c ON c.Id = o.CustomerId
                                         LEFT JOIN PaymentType pt ON pt.Id = o.PaymentTypeId
                                         LEFT JOIN OrderProduct op ON op.OrderId = o.Id
@@ -63,12 +63,12 @@ namespace BangazonAPI.Controllers
 
             if (completed)
             {
-                sql = $@"{sql} AND o.PaymentTYpeId IS NOT NULL";
+                sql = $@"{sql} AND o.PaymentTypeId IS NOT NULL";
             }
 
             if (completed == false)
             {
-                sql = $@"{sql} AND o.PaymentTYpeId IS NULL";
+                sql = $@"{sql} AND o.PaymentTypeId IS NULL";
             }
 
             using (SqlConnection conn = Connection)
