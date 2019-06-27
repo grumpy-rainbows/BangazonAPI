@@ -10,7 +10,7 @@ namespace BangazonAPI.Models
 {
     public class Product
     {
-        public int Id { get; set; }che
+        public int Id { get; set; }
         [Required]
         public int ProductTypeId { get; set; }
         [Required]
