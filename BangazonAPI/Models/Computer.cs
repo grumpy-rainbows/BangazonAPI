@@ -21,9 +21,7 @@ namespace BangazonAPI.Models
         [Required]
         public string Manufacturer { get; set; }
 
-        public int EmployeeId { get; set; }
-
-        public Employee Employee { get; set; }
+        public List<Employee> Employees { get; set; }
 
     }
 }
