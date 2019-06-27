@@ -5,6 +5,7 @@
  */
 
 using BangazonAPI.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -34,7 +35,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        //Get all Employee and depertmentId
+        //Get all Employee, depertment, nad Cumputer
         [HttpGet]
         public IEnumerable<Employee> Get()
         {
@@ -163,10 +164,6 @@ namespace BangazonAPI.Controllers
 
                             employees.Computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("ComputerDecomissionDate"));
 
-
-
-
-
                         }
 
                     }
@@ -175,4 +172,91 @@ namespace BangazonAPI.Controllers
                 }
             }
 
-        } } }
+        }
+
+        //Post api:Employee
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] Employee newEmployee)
+        {
+            using (SqlConnection conn = Connection)
+            {
+
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @" INSERT INTO Employee (FirstName, LastName, IsSuperVisor, DepartmentId) 
+                                                                OUTPUT INSERTED.Id 
+                                                                    VALUES (@FirstName, @LastName, @IsSuperVisor, @DepartmentId)";
+                    cmd.Parameters.Add(new SqlParameter("@FirstName", newEmployee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@LastName", newEmployee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@IsSuperVisor", newEmployee.IsSuperVisor));
+                    cmd.Parameters.Add(new SqlParameter("@DepartmentId", newEmployee.DepartmentId));
+
+                    int newId = (int)cmd.ExecuteNonQuery();
+                    newEmployee.Id = newId;
+                    return CreatedAtRoute("GetEmployeeById", new { Id = newId }, newEmployee);
+                }
+            }
+        }
+
+        //Put  Product Type
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
+        {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @" INSERT INTO Employee (FirstName, LastName, IsSuperVisor, DepartmentId) 
+                                                                OUTPUT INSERTED.Id 
+                                                                    VALUES (@FirstName, @LastName, @IsSuperVisor, @DepartmentId)";
+                        cmd.Parameters.Add(new SqlParameter("@FirstName", employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@LastName", employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@IsSuperVisor", employee.IsSuperVisor));
+                        cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
+
+                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!EmployeeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+            private bool EmployeeExists(int id)
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"SELECT Id FROM Employee WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+                        return reader.Read();
+                    }
+
+                }
+
+
+            }
+     }
+}
