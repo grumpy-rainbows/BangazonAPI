@@ -35,7 +35,7 @@ namespace BangazonAPI.Controllers
         }
         // GET: api/Order
         [HttpGet]
-        public async Task<IActionResult> Get(string include, bool completed)
+        public async Task<IActionResult> Get(string _include, string _completed)
         {
             string sql = @"SELECT o.Id AS OrderId,
                                         o.PaymentTypeId,
@@ -51,7 +51,7 @@ namespace BangazonAPI.Controllers
                                         p.Description,
                                         p.Quantity,
                                         p.ProductTypeId,
-                                        prodt.Id AS ProductTypeId,
+                                        p.CustomerId AS ProductCustomerId,
                                         prodt.Name AS ProductTypeName
                                         FROM [Order] o
                                         LEFT JOIN Customer c ON c.Id = o.CustomerId
@@ -61,12 +61,12 @@ namespace BangazonAPI.Controllers
                                         LEFT JOIN ProductType prodt ON prodt.Id = p.ProductTypeId
                                         WHERE 2=2";
 
-            if (completed)
+            if (_completed == "true")
             {
                 sql = $@"{sql} AND o.PaymentTypeId IS NOT NULL";
             }
 
-            if (completed == false)
+            if (_completed == "false")
             {
                 sql = $@"{sql} AND o.PaymentTypeId IS NULL";
             }
@@ -77,11 +77,6 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = sql;
-
-                    if (include != null)
-                    {
-                        cmd.Parameters.Add(new SqlParameter("@include", $"%{include}%"));
-                    }
 
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
@@ -95,25 +90,29 @@ namespace BangazonAPI.Controllers
                             orderHash[orderId] = new Order
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
-                                PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                                 CustomerId = reader.GetInt32(reader.GetOrdinal("CusId")),
-                                PaymentType = new PaymentType
-                                {
-                                    Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
-                                    AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
-                                    Name = reader.GetString(reader.GetOrdinal("PaymentTypeName")),
-                                    CustomerId = reader.GetInt32(reader.GetOrdinal("PayCusId"))
-                                }
                             };
                         }
 
-                        if (@include == "products")
+                        if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
+                        {
+                            orderHash[orderId].PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"));
+                             orderHash[orderId].PaymentType = new PaymentType
+                             {
+                                 Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                 AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                                 Name = reader.GetString(reader.GetOrdinal("PaymentTypeName")),
+                                 CustomerId = reader.GetInt32(reader.GetOrdinal("PayCusId"))
+                             };
+                        }
+
+                        if (_include == "products" && !reader.IsDBNull(reader.GetOrdinal("ProductId")))
                         {
                             orderHash[orderId].Products.Add(new Product
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
                                 ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
-                                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                CustomerId = reader.GetInt32(reader.GetOrdinal("ProductCustomerId")),
                                 Price = reader.GetDecimal(reader.GetOrdinal("Price")),
                                 Title = reader.GetString(reader.GetOrdinal("Title")),
                                 Description = reader.GetString(reader.GetOrdinal("Description")),
@@ -125,7 +124,7 @@ namespace BangazonAPI.Controllers
                                 }
                             });
                         }
-                        if (@include == "customers")
+                        if (_include == "customers")
                         {
                             orderHash[orderId].Customer = new Customer
                             {
