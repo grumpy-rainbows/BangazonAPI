@@ -37,15 +37,15 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/PaymentType/1");
+                var response = await client.GetAsync("/api/PaymentType/2");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var paymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(22222, paymentType.AcctNumber);
-                Assert.Equal("Test", paymentType.Name);
+                Assert.Equal(12345, paymentType.AcctNumber);
+                Assert.Equal("Visa", paymentType.Name);
                 Assert.NotNull(paymentType);
             }
         }
