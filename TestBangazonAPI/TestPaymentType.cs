@@ -37,7 +37,7 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                var response = await client.GetAsync("/api/PaymentType/2");
+                var response = await client.GetAsync("/api/PaymentType/1");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
