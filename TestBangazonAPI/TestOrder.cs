@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -182,6 +183,33 @@ namespace TestBangazonAPI
                 Assert.True(order.Products.Count > 0);
                 Assert.Equal(21, order.Products[0].Quantity);
                 Assert.Equal("Harry Potter and the Half-blood Prince", order.Products[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Create_And_Delete_Order()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                Order order = new Order
+                {
+                    CustomerId = 4,
+                    PaymentTypeId = 1
+                };
+
+                var orderAsJSON = JsonConvert.SerializeObject(order);
+
+                var response = await client.PostAsync(
+                    "/api/Order",
+                    new StringContent(orderAsJSON, Encoding.UTF8, "application/json")
+                    );
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var newOrder = JsonConvert.DeserializeObject<Order>(responseBody);
+
+                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+                Assert.Equal(4, newOrder.CustomerId);
+                Assert.Equal(1, newOrder.PaymentTypeId);
             }
         }
     }

@@ -143,7 +143,7 @@ namespace BangazonAPI.Controllers
         }
 
         // GET: api/Order/5
-        [HttpGet("{id}", Name = "Get")]
+        [HttpGet("{id}", Name = "GetOrder")]
         public async Task<IActionResult> Get([FromRoute] int id, string _include, string _completed)
         {
             if (!OrderExists(id))
@@ -251,11 +251,26 @@ namespace BangazonAPI.Controllers
             }
         }
 
-
         // POST: api/Order
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] Order order)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO [Order] (CustomerId, PaymentTypeId) 
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@customerId, @paymentTypeId)";
+                    cmd.Parameters.Add(new SqlParameter("@customerId", order.CustomerId));
+                    cmd.Parameters.Add(new SqlParameter("@paymentTypeId", order.PaymentTypeId));
+
+                    order.Id = (int)await cmd.ExecuteScalarAsync();
+
+                    return CreatedAtRoute("GetOrder", new { id = order.Id }, order);
+                }
+            }
         }
 
         // PUT: api/Order/5
