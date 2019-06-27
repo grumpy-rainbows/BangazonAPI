@@ -22,6 +22,12 @@ namespace BangazonAPI.Models
         [Required]
         public int DepartmentId { get; set; }
 
+        public List<TrainingProgram> EmployeeTrainingPrograms { get; set; } = new List<TrainingProgram>();
+
+        public int ComputerId { get; set; }
+
+        public Computer Computer { get; set; }
+
         public Department Department { get; set; }
     }
 }
