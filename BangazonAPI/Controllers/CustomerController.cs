@@ -1,4 +1,4 @@
-﻿/* Author: Brian Jobe
+﻿﻿/* Author: Brian Jobe
  * Purpose: Creating a controller for the Customer class. 
  * Methods: GET ALL, GET SINGLE, POST, PUT, and DELETE
  */
