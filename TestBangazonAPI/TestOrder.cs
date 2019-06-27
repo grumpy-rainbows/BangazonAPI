@@ -45,7 +45,7 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(orders.Count > 0);
-                Assert.True(orders[0].PaymentType != null);
+                Assert.NotNull(orders[0].PaymentType);
             }
         }
 
@@ -79,7 +79,7 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(orders.Count > 0);
-                Assert.True(orders[0].Customer.FirstName != null);
+                Assert.NotNull(orders[0].Customer.FirstName);
             }
         }
 
@@ -96,7 +96,92 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(orders.Count > 0);
-                Assert.True(orders[0].Products[0].Title != null);
+                Assert.NotNull(orders[0].Products[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_Single_Order()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/api/Order/1");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var order = JsonConvert.DeserializeObject<Order>(responseBody);
+                 
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(1, order.CustomerId);
+                Assert.Equal(2, order.PaymentTypeId);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_Single_Completed_Order()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/api/Order/1/?_completed=true");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var order = JsonConvert.DeserializeObject<Order>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(12345, order.PaymentType.AcctNumber);
+                Assert.Equal("Visa", order.PaymentType.Name);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_Single_Incomplete_Order()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/api/Order/5/?_completed=false");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var order = JsonConvert.DeserializeObject<Order>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Null(order.PaymentType);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_Single_Order_With_Customers()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/api/Order/1/?_include=customers");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var order = JsonConvert.DeserializeObject<Order>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal("Jameka", order.Customer.FirstName);
+                Assert.Equal("Echols", order.Customer.LastName);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Get_Single_Order_With_Products()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/api/Order/2/?_include=products");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var order = JsonConvert.DeserializeObject<Order>(responseBody);
+
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.True(order.Products.Count > 0);
+                Assert.Equal(21, order.Products[0].Quantity);
+                Assert.Equal("Harry Potter and the Half-blood Prince", order.Products[0].Title);
             }
         }
     }

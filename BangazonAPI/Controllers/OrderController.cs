@@ -195,24 +195,19 @@ namespace BangazonAPI.Controllers
 
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                    Dictionary<int, Order> orderHash = new Dictionary<int, Order>();
-
-                    while (reader.Read())
+                    Order order = null;
+                    if (reader.Read())
                     {
-                        int orderId = reader.GetInt32(reader.GetOrdinal("OrderId"));
-                        if (!orderHash.ContainsKey(orderId))
+                        order = new Order
                         {
-                            orderHash[orderId] = new Order
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
-                                CustomerId = reader.GetInt32(reader.GetOrdinal("CusId")),
-                            };
-                        }
+                            Id = reader.GetInt32(reader.GetOrdinal("OrderId")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CusId")),
+                        };
 
                         if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
                         {
-                            orderHash[orderId].PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"));
-                            orderHash[orderId].PaymentType = new PaymentType
+                            order.PaymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId"));
+                            order.PaymentType = new PaymentType
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
                                 AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
@@ -223,7 +218,7 @@ namespace BangazonAPI.Controllers
 
                         if (_include == "products" && !reader.IsDBNull(reader.GetOrdinal("ProductId")))
                         {
-                            orderHash[orderId].Products.Add(new Product
+                            order.Products.Add(new Product
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
                                 ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
@@ -241,7 +236,7 @@ namespace BangazonAPI.Controllers
                         }
                         if (_include == "customers")
                         {
-                            orderHash[orderId].Customer = new Customer
+                            order.Customer = new Customer
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("CusId")),
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
@@ -249,10 +244,9 @@ namespace BangazonAPI.Controllers
                             };
                         }
                     }
-                    List<Order> orders = orderHash.Values.ToList();
                     reader.Close();
 
-                    return Ok(orders);
+                    return Ok(order);
                 }
             }
         }
