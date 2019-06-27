@@ -59,7 +59,7 @@ namespace TestBangazonAPI
                 var phoneAsJson = JsonConvert.SerializeObject(Phone);
 
                 var response = await client.PostAsync(
-                    "/api/productType",
+                    "/api/productType/",
                     new StringContent(phoneAsJson, Encoding.UTF8, "application/json")
                     );
 
