@@ -1,3 +1,11 @@
+/* Author: Brian Jobe
+ * Purpose: Creating tests for the Customer controller methods of GET, POST, PUT. 
+ * Methods: Test_Get_All_Customer, Test_Single_Customer, Test_Create_and_Delete_PaymentType, Test_Modify_Customer.
+ */
+
+
+
+
 using System;
 using System.Net;
 using Newtonsoft.Json;
@@ -71,7 +79,6 @@ namespace TestBangazonAPI
                     new StringContent(johnAsJSON, Encoding.UTF8, "application/json")
                 );
 
-
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var newJohn = JsonConvert.DeserializeObject<Customer>(responseBody);
 
@@ -123,7 +130,6 @@ namespace TestBangazonAPI
 
                 Assert.Equal(HttpStatusCode.OK, getCustomer.StatusCode);
                 Assert.Equal(newLastName, newCustomer.LastName);
-
 
                 Customer originalCustomer = new Customer
                 {

@@ -1,4 +1,13 @@
-﻿using System;
+﻿/* Author: Brian Jobe
+ * Purpose: Creating a controller for the Customer class. 
+ * Methods: GET ALL, GET SINGLE, POST, PUT, and DELETE
+ */
+
+
+
+
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
