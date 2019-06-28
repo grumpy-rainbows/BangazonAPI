@@ -34,3 +34,37 @@ Now, you'll be taken to Visual Studio with the project opened up. The next thing
 ```
 http://localhost:5000
 ```
+
+###### You are now ready to use our BangazonAPI. 
+
+
+## User instructions
+* You are able to few several resources: `Products`, `Orders`, `PaymentTypes`, `Computers` and `ProductTypes`.
+* Open Postman and make a call to GET, POST, PUT and DELETE operations on all of the resources. 
+
+### We hope you enjoyed our app! :)
+
+
+## Built With
+
+* [C#](https://docs.microsoft.com/en-us/dotnet/csharp/) - The language we used
+* [ADO.NET](https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/ado-net-overview) - SQL access
+* [Azure](https://gruntjs.com/) - Cloud for database
+* [ASP.NET](https://dotnet.microsoft.com/apps/aspnet) - Framework for Web app 
+* [Postman](https://www.getpostman.com/) - Testing fetch calls
+
+
+
+## Authors
+
+* **Ali Abdulle** 
+* **Jameka Echols** 
+* **Billy Mathison** 
+* **Brian Jobe** 
+
+
+
+## Acknowledgments
+
+* Inspiration
+* [PurpleBooth](https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/8254b53ab8dcb18afc64287aaddd9e5b6059f880/README-Template.md) - For their template
