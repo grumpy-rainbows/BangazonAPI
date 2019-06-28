@@ -285,7 +285,7 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE [Order]
-                                            SET CustomerId = @customerId
+                                            SET CustomerId = @customerId,
                                             PaymentTypeId = @paymentTypeId
                                             WHERE Id = @Id";
                         cmd.Parameters.Add(new SqlParameter("@customerId", order.CustomerId));
