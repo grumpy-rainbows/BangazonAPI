@@ -1,6 +1,6 @@
 ﻿/* Author: Billy Mathison
  * Purpose: Creating tests for the Order controller methods of GET, POST, PUT, and DELETE. 
- * Methods: Test_Get_All_orders, 
+ * Methods: Test_Get_All_orders, Test_Get_All_Completed_Orders, Test_Get_All_Incomplete_Orders, Test_Get_All_Orders_With_Customers, Test_Get_All_Orders_With_Products, Test_Get_Single_Order, Test_Get_Single_Completed_Order, Test_Get_Single_Incomplete_Order, Test_Get_Single_Order_With_Customers, Test_Get_Single_Order_With_Products, Test_Get_NonExistant_Order_Fails, Test_Create_And_Delete_Order, Test_Modify_Order, Test_Modify_Order_Again
  */
 
 using BangazonAPI.Models;
@@ -111,7 +111,7 @@ namespace TestBangazonAPI
 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var order = JsonConvert.DeserializeObject<Order>(responseBody);
-                 
+
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(1, order.CustomerId);
                 Assert.Equal(2, order.PaymentTypeId);
@@ -187,6 +187,16 @@ namespace TestBangazonAPI
         }
 
         [Fact]
+        public async Task Test_Get_NonExistant_Order_Fails()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var response = await client.GetAsync("/api/order/99999999");
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            }
+        }
+
+        [Fact]
         public async Task Test_Create_And_Delete_Order()
         {
             using (var client = new APIClientProvider().Client)
@@ -210,6 +220,105 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
                 Assert.Equal(4, newOrder.CustomerId);
                 Assert.Equal(1, newOrder.PaymentTypeId);
+
+                var deleteResponse = await client.DeleteAsync($"/api/Order/{newOrder.Id}");
+                Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Delete_NonExistent_Order_Fails()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                var deleteResponse = await client.DeleteAsync("/api/order/600000");
+
+                Assert.False(deleteResponse.IsSuccessStatusCode);
+                Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Modify_Order()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /*Initial GET
+                 */
+                var order = await client.GetAsync("/api/Order/1");
+                Assert.Equal(HttpStatusCode.OK, order.StatusCode);
+
+                /*
+                    PUT section
+                 */
+                Order modifiedOrder = new Order
+                {
+                    CustomerId = 1,
+                    PaymentTypeId = 3
+                };
+                var modifiedOrderAsJSON = JsonConvert.SerializeObject(modifiedOrder);
+
+                var response = await client.PutAsync(
+                    "/api/Order/1",
+                    new StringContent(modifiedOrderAsJSON, Encoding.UTF8, "application/json")
+                );
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+                /*
+                    GET section
+                 */
+                var getOrder = await client.GetAsync("/api/Order/1");
+                getOrder.EnsureSuccessStatusCode();
+
+                string getOrderBody = await getOrder.Content.ReadAsStringAsync();
+                Order newOrder = JsonConvert.DeserializeObject<Order>(getOrderBody);
+
+                Assert.Equal(HttpStatusCode.OK, getOrder.StatusCode);
+                Assert.Equal(3, newOrder.PaymentTypeId);
+            }
+        }
+
+        [Fact]
+        public async Task Test_Modify_Order_Again()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                /*Initial GET
+                 */
+                var order = await client.GetAsync("/api/Order/1");
+                Assert.Equal(HttpStatusCode.OK, order.StatusCode);
+
+                /*
+                    PUT section
+                 */
+                Order modifiedOrder = new Order
+                {
+                    CustomerId = 1,
+                    PaymentTypeId = 2
+                };
+                var modifiedOrderAsJSON = JsonConvert.SerializeObject(modifiedOrder);
+
+                var response = await client.PutAsync(
+                    "/api/Order/1",
+                    new StringContent(modifiedOrderAsJSON, Encoding.UTF8, "application/json")
+                );
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+                /*
+                    GET section
+                 */
+                var getOrder = await client.GetAsync("/api/Order/1");
+                getOrder.EnsureSuccessStatusCode();
+
+                string getOrderBody = await getOrder.Content.ReadAsStringAsync();
+                Order newOrder = JsonConvert.DeserializeObject<Order>(getOrderBody);
+
+                Assert.Equal(HttpStatusCode.OK, getOrder.StatusCode);
+                Assert.Equal(2, newOrder.PaymentTypeId);
             }
         }
     }
