@@ -89,7 +89,7 @@ namespace BangazonAPI.Controllers
                         computer = computers.Find(a => a.Id == reader.GetInt32(reader.GetOrdinal("Id")));
 
                         if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
-                            {
+                        {
                             Employee employee = new Employee
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
@@ -129,8 +129,8 @@ namespace BangazonAPI.Controllers
                                     e.IsSuperVisor, 
                                     e.DepartmentId
                                     FROM Computer c
-                                    JOIN ComputerEmployee ce ON ce.ComputerId = c.Id
-                                    JOIN Employee e ON ce.EmployeeId = e.Id
+                                    LEFT JOIN ComputerEmployee ce ON ce.ComputerId = c.Id
+                                    LEFT JOIN Employee e ON ce.EmployeeId = e.Id
                                     WHERE c.Id = @id";
 
             using (SqlConnection conn = Connection)
@@ -143,32 +143,37 @@ namespace BangazonAPI.Controllers
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
                     Computer computer = null;
-                    List<Employee> employees = new List<Employee>();
 
+                    List<Employee> employees = new List<Employee>();
                     if (reader.Read())
                     {
                         computer = new Computer
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
-                            DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
                             Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
                             Employees = employees
                         };
 
+                        if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                        {
+                            computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+                        }
 
-                    Employee employee = new Employee
-                    {
-                        Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
-                        DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                        LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                        IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
-                    };
-                    computer.Employees.Add(employee);
-                }
-
+                        if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            Employee employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                IsSuperVisor = reader.GetBoolean(reader.GetOrdinal("IsSuperVisor"))
+                            };
+                            computer.Employees.Add(employee);
+                        }
+                    }
                     reader.Close();
 
                     return Ok(computer);
@@ -188,7 +193,7 @@ namespace BangazonAPI.Controllers
                     cmd.CommandText = @"
                         INSERT INTO Computer (PurchaseDate, DecomissionDate, Make, Manufacturer)
                         OUTPUT INSERTED.Id
-                        VALUES (@purchaseDate, @decomissionDate, @Make, @Manufacturer)
+                        VALUES (@purchaseDate, @decomissionDate, @make, @manufacturer)
                     ";
                     cmd.Parameters.Add(new SqlParameter("@purchaseDate", computer.PurchaseDate));
                     cmd.Parameters.Add(new SqlParameter("@decomissionDate", computer.DecomissionDate));

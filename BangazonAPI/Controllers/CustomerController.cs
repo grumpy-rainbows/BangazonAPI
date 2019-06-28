@@ -186,11 +186,13 @@ namespace BangazonAPI.Controllers
 
 
                     Customer customer = null;
+
                     List<Product> products = new List<Product>();
                     List<PaymentType> paymentTypes = new List<PaymentType>();
 
                     if (reader.Read())
                     {
+
                         customer = new Customer
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
