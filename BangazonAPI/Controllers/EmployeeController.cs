@@ -217,6 +217,7 @@ namespace BangazonAPI.Controllers
                         cmd.Parameters.Add(new SqlParameter("@LastName", employee.LastName));
                         cmd.Parameters.Add(new SqlParameter("@IsSuperVisor", employee.IsSuperVisor));
                         cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
                         if (rowsAffected > 0)
