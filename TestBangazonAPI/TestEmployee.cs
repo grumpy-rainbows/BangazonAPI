@@ -57,13 +57,7 @@ namespace TestBangazonAPI
                 {
                     FirstName = "David",
                     LastName = "Thomes"
-                //    IsSuperVisor = true,
-                //    DepartmentId = 1,
-                //    Department = new Department
-                //    {
-                //        Id = 4,
-                //        Name = "Logistics",
-                //    }
+
                 };
                 var localAsJson = JsonConvert.SerializeObject(local);
 
@@ -76,22 +70,11 @@ namespace TestBangazonAPI
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var newLocal = JsonConvert.DeserializeObject<Employee>(responseBody);
 
-
-
                 Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-
                 Assert.Equal("David", newLocal.FirstName);
-
                 Assert.Equal("Thomes", newLocal.LastName);
-
-               // Assert.Equal(1, local.DepartmentId);
-
-
-
-
-
+             
                 var deleteResponse = await client.DeleteAsync($"api/Employee/{newLocal.Id}");
-
                 Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
             }
 
