@@ -237,15 +237,9 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT p.Id,
-                                        p.AcctNumber,
-                                        p.Name,
-                                        p.CustomerId,
-                                        c.FirstName,
-                                        c.LastName 
-                                        FROM PaymentType p
-                                        LEFT JOIN Customer c ON c.Id = p.CustomerId
-                                        WHERE p.Id = @id";
+                    cmd.CommandText = @"SELECT Id
+                                        FROM PaymentType 
+                                        WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
