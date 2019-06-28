@@ -1,41 +1,36 @@
-# Building the Bangazon Platform API
+# BangazonAPI
 
-Welcome, new Bangazonians!
+Welcome to the Bangazon Platform API
 
-Your job is to build out a .NET Web API that makes each resource in the Bangazon ERD available to application developers throughout the entire company.
+## Getting Started
 
-1. Products
-1. Product types
-1. Customers
-1. Orders
-1. Payment types
-1. Employees
-1. Computers
-1. Training programs
-1. Departments
+These instructions will get you a copy of the project up and running on your local machine
 
-> **Pro tip:** You do not need to make a Controller for the join tables, because those aren't resources.
+### Installing
 
-Your product owner will provide you with a prioritized backlog of features for you to work on over the development sprint. The first version of the API will be completely open since we have not determined which authentication method we want to use yet.
+First, you'll need to clone down the repo into a directory. Open your terminal and enter
 
-The only restriction on the API is that only requests from the `www.bangazon.com` domain should be allowed. Requests from that domain should be able to access every resource, and perform any operation a resource.
+```
+git clone git@github.com:grumpy-rainbows/BangazonAPI.git
+```
 
-## Plan
+You'll need to create a database and also, add data. We used Azure, we recommend using either Azure or SSMS and to run the script to create the database [Official Banagazon SQL](./bangazon.sql).
 
-First, you need to plan. Your team needs to use the official SQL script (see below) and build a  Bangazon ERD using dbdiagram.io. Once your team agrees that the ERD is complete, you must get it approved by your manager before you begin writing code for the API.
+The next thing to do is add data to each of the tables. We've provided you with the following script [Bangazon Data SQL](./data.sql).
 
-## Modeling
 
-Next, you need to author the Models needed for your API. Make sure that each model has the approprate foreign key relationship defined on it, either with a custom type or an `List<T>` to store many related things. The boilerplate code shows you one example - the relationship between `Order` and `OrderProduct`, which is 1 -> &#8734;. For every _OrderId_, it can be stored in the `OrderProduct` table many times.
+After that, open up your editor which we prefer to be Visual Studio, through the terminal with the command
 
-## Database Management
+```
+cd BangazonAPI/BangazonAPI
+```
 
-You will be using the [Official Bangazon SQL](./bangazon.sql) file to create your database. Create the database using SSMS, create a new SQL script for that database, copy the contents of the SQL file into your script, and then execute it.
+```
+start BangazonApi.csproj
+```
 
-## Controllers
+Now, you'll be taken to Visual Studio with the project opened up. The next thing you'll want to do it start the application and Run the program. On the upper middle part of the toolbar, you'll see a green arrow and `IIS Express`, click on the dropdown button and choose `BangazonAPI`. This will run the program and automatically open up a window to see our API. If for some chance you are not directed, simply go to your browser and enter in 
 
-Now it's time to build the controllers that handle GET, POST, PUT, and DELETE operations on each resource. Make sure you read, and understand, the requirements in the issue tickets to you can use  SQL to return the correct data structure to client requests.
-
-## Test Classes
-
-Each feature ticket your team will work on for this sprint has testing requirements. This boilerplate solution has a testing project includes with some starter code. You must make sure that all tests pass before you submit a PR.
+```
+http://localhost:5000
+```
